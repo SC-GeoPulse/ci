@@ -67,9 +67,9 @@ jobs:
                 prerelease: false
                 title: GeoPulse
                 files: |
-                    ${{ github.workspace }}/backend/out/auth
-                    ${{ github.workspace }}/backend/out/geo
-                    ${{ github.workspace }}/backend/out/mgmt
+                    ${{ github.workspace }}/backend/bin/auth
+                    ${{ github.workspace }}/backend/bin/geo
+                    ${{ github.workspace }}/backend/bin/mgmt
 
             - name: Write Dockerfile
               if: ${{ github.ref == 'refs/heads/master' }}
