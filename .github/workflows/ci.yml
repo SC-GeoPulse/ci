@@ -67,6 +67,7 @@ jobs:
                 prerelease: false
                 title: GeoPulse
                 files: |
+                    ${{ github.workspace }}/backend/config.json
                     ${{ github.workspace }}/backend/bin/auth
                     ${{ github.workspace }}/backend/bin/geo
                     ${{ github.workspace }}/backend/bin/mgmt
@@ -88,14 +89,17 @@ jobs:
 
                 FROM ubuntu:latest
 
-                # Download archive
+                # Download required files
                 ADD "${{ github.server_url }}/${{ github.repository }}/releases/latest/download/$COMPONENT" $COMPONENT
 
-                # Load development secrets & copy for publish
+                # Default configuration, published along with the binaries
+                ADD "${{ github.server_url }}/${{ github.repository }}/releases/latest/download/config.json" config.json
+
+                # Load development secrets
                 RUN --mount=type=secret,id=config_local_json,dst=/etc/secrets/config.local.json \
                     cp /etc/secrets/config.local.json .
 
-                ENTRYPOINT [\"$COMPONENT\"]
+                ENTRYPOINT [\"./$COMPONENT\"]
 
                 " > Dockerfile.$COMPONENT
                 done
