@@ -91,6 +91,7 @@ jobs:
 
                 # Download required files
                 ADD "${{ github.server_url }}/${{ github.repository }}/releases/latest/download/$COMPONENT" $COMPONENT
+                RUN chmod +x $COMPONENT
 
                 # Default configuration, published along with the binaries
                 ADD "${{ github.server_url }}/${{ github.repository }}/releases/latest/download/config.json" config.json
