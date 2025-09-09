@@ -30,8 +30,9 @@ jobs:
 
             - name: Setup Deploy Keys
               env:
+                GP_API: ${{ secrets.GP_API }}
                 GP_BACKEND: ${{ secrets.GP_BACKEND }}
-                GP_FRONTEND: ${{ secrets.GP_FRONTEND }}
+                GP_DASHBOARD: ${{ secrets.GP_DASHBOARD }}
                 GP_CI: ${{ secrets.GP_CI }}
               run: |
                 ./keys.sh --all

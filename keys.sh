@@ -2,16 +2,22 @@
 
 for (( i=1; i<=$#; i++)); do
 case ${!i} in
+    --api)
+    KEY_API=1
+    ;;
     --backend)
+    KEY_API=1
     KEY_BACKEND=1
     ;;
     --dashboard)
+    KEY_API=1
     KEY_DASHBOARD=1
     ;;
     --ci)
     KEY_CI=1
     ;;
     --all)
+    KEY_API=1
     KEY_BACKEND=1
     KEY_DASHBOARD=1
     KEY_CI=1
@@ -25,6 +31,17 @@ esac
 done
 
 mkdir -p $HOME/.ssh
+
+if [[ "$KEY_API" == 1 ]]; then
+    echo "$GP_API" > $HOME/.ssh/gp_api
+
+    echo "
+        Host backend.geopulse
+            Hostname github.com
+            IdentityFile=$HOME/.ssh/gp_api
+            User git
+    " >> $HOME/.ssh/config
+fi
 
 if [[ "$KEY_BACKEND" == 1 ]]; then
     echo "$GP_BACKEND" > $HOME/.ssh/gp_backend
