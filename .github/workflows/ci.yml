@@ -90,7 +90,7 @@ jobs:
                 FROM ubuntu:latest
 
                 # Install certificate authorities, not included in minimal image
-                RUN apt-get install -y ca-certificates
+                RUN apt-get update && apt-get install -y ca-certificates
 
                 # Download required files
                 ADD "${{ github.server_url }}/${{ github.repository }}/releases/latest/download/$COMPONENT" $COMPONENT
