@@ -1,10 +1,10 @@
-name: Build
+name: Continuous Integration
 on:
     workflow_dispatch:
     repository_dispatch:
     push:
       paths:
-        - '.github/workflows/build.yml'
+        - '.github/workflows/ci.yml'
         - '*.sh'
       branches:
         - master
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
     ci:
-        name: Build
+        name: Continuous Integration
         if: ${{ !github.event.client_payload.ref || github.event.client_payload.ref == 'refs/heads/master' }}
         runs-on: ubuntu-latest
         env:
