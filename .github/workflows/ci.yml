@@ -39,7 +39,7 @@ jobs:
 
             - name: Build and Test Backend
               run: |
-                git clone --recurse-submodules \
+                git clone \
                   git@backend.geopulse:${{ github.repository_owner }}/${{ env.REPO_BACKEND }}.git \
                   ${{ github.workspace }}/backend
 

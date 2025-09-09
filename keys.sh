@@ -6,11 +6,9 @@ case ${!i} in
     KEY_API=1
     ;;
     --backend)
-    KEY_API=1
     KEY_BACKEND=1
     ;;
     --dashboard)
-    KEY_API=1
     KEY_DASHBOARD=1
     ;;
     --ci)
