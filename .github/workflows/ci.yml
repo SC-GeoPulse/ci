@@ -114,7 +114,7 @@ jobs:
                 FROM traefik:latest
 
                 # Load secrets
-                RUN --mount=type=secret,id=traefik.yml,dst=/etc/secrets/traefik.yml \
+                RUN --mount=type=secret,id=traefik_yml,dst=/etc/secrets/traefik.yml \
                     cp /etc/secrets/traefik.yml .
 
                 ENTRYPOINT [\"traefik\", \"--configFile=traefik.yml\"]
