@@ -34,7 +34,7 @@ if [[ "$KEY_API" == 1 ]]; then
     echo "$GP_API" > $HOME/.ssh/gp_api
 
     echo "
-        Host backend.geopulse
+        Host api.geopulse
             Hostname github.com
             IdentityFile=$HOME/.ssh/gp_api
             User git
