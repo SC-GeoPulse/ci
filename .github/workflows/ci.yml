@@ -116,6 +116,9 @@ jobs:
                 # Load secrets
                 RUN --mount=type=secret,id=traefik_yml,dst=/etc/secrets/traefik.yml \
                     cp /etc/secrets/traefik.yml .
+                RUN mkdir config
+                RUN --mount=type=secret,id=geopulse_yml,dst=/etc/secrets/geopulse.yml \
+                    cp /etc/secrets/geopulse.yml ./config
 
                 ENTRYPOINT [\"traefik\", \"--configFile=traefik.yml\"]
 
