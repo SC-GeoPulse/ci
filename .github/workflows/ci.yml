@@ -23,6 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             REPO_BACKEND: backend
+            REPO_DASHBOARD: dashboard
             REPO_CI: ci
         steps:
             - name: Checkout
@@ -58,6 +59,36 @@ jobs:
 
                 popd
 
+            - name: Build and Test Dashboard
+              run: |
+                git clone \
+                  git@dashboard.geopulse:${{ github.repository_owner }}/${{ env.REPO_DASHBOARD }}.git \
+                  ${{ github.workspace }}/dashboard
+
+                pushd dashboard
+
+                ${{ github.workspace }}/report.sh \
+                  --state "pending" \
+                  --description "GitHub Actions workflow requested" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }} \
+                  --repo ${{ env.REPO_DASHBOARD }} \
+                  --commit $(git rev-parse HEAD)
+
+                # Needed for building
+                # Since we are not deploying this, we do not need real values.
+                cp .env.example .env
+
+                npm install
+                npm run build
+
+                pushd out
+                fileName=${{ github.workspace }}/dashboard/dashboard
+                tar -cf $fileName.tar *
+                gzip -9 < $fileName.tar > $fileName.tar.gz
+                popd
+
+                popd
+
             - name: Create Release
               if: ${{ github.ref == 'refs/heads/master' }}
               uses: marvinpinto/action-automatic-releases@latest
@@ -71,6 +102,7 @@ jobs:
                     ${{ github.workspace }}/backend/bin/auth
                     ${{ github.workspace }}/backend/bin/geo
                     ${{ github.workspace }}/backend/bin/mgmt
+                    ${{ github.workspace }}/dashboard/dashboard.tar.gz
 
             - name: Write Dockerfile
               if: ${{ github.ref == 'refs/heads/master' }}
@@ -146,6 +178,15 @@ jobs:
                   --commit $(git rev-parse HEAD)
                 popd
 
+                pushd ${{ github.workspace }}/dashboard
+                ${{ github.workspace }}/report.sh \
+                  --state "success" \
+                  --description "GitHub Actions workflow succeeded" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }} \
+                  --repo ${{ env.REPO_DASHBOARD }} \
+                  --commit $(git rev-parse HEAD)
+                popd
+
             - name: Mark Commit Failure
               if: failure()
               run: |
@@ -156,6 +197,17 @@ jobs:
                     --description "GitHub Actions workflow failed" \
                     --token ${{ secrets.GP_GITHUB_TOKEN }} \
                     --repo ${{ env.REPO_BACKEND }} \
+                    --commit $(git rev-parse HEAD)
+                  popd
+                fi
+
+                if [ -d "${{ github.workspace }}/dashboard" ]; then
+                  pushd ${{ github.workspace }}/dashboard
+                  ${{ github.workspace }}/report.sh \
+                    --state "failure" \
+                    --description "GitHub Actions workflow failed" \
+                    --token ${{ secrets.GP_GITHUB_TOKEN }} \
+                    --repo ${{ env.REPO_DASHBOARD }} \
                     --commit $(git rev-parse HEAD)
                   popd
                 fi
