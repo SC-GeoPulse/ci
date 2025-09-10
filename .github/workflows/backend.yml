@@ -50,7 +50,8 @@ jobs:
 
                 popd
 
-            - uses: actions/upload-artifact@v4
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
               with:
                 name: backend
                 path: backend/bin/*
