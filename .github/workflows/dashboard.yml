@@ -43,6 +43,10 @@ jobs:
                 git fetch origin ${{ env.GP_COMMIT }}
                 git reset --hard ${{ env.GP_COMMIT }}
 
+                # Needed for building
+                # Since we are not deploying this, we do not need real values.
+                cp .env.example .env
+
                 npm install
                 npm run build
 
