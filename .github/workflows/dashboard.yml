@@ -1,0 +1,71 @@
+name: Unit Testing (Dashboard)
+on:
+    repository_dispatch:
+        types: [dashboard]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.event.client_payload.after }}
+  cancel-in-progress: true
+
+jobs:
+    ci:
+        name: Unit Testing (Dashboard)
+        runs-on: ubuntu-latest
+        env:
+            REPO_DASHBOARD: dashboard
+            GP_REPO: dashboard
+            GP_COMMIT: ${{ github.event.client_payload.after }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Mark Commit Status
+              run: |
+                ./report.sh \
+                  --state "pending" \
+                  --description "GitHub Actions workflow requested" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
+
+            - name: Setup Deploy Keys
+              env:
+                GP_DASHBOARD: ${{ secrets.GP_DASHBOARD }}
+              run: |
+                ./keys.sh --dashboard
+
+            - name: Build and Test
+              run: |
+                git clone \
+                  git@dashboard.geopulse:${{ github.repository_owner }}/${{ env.REPO_DASHBOARD }}.git \
+                  ${{ github.workspace }}/dashboard
+
+                pushd dashboard
+
+                git fetch origin ${{ env.GP_COMMIT }}
+                git reset --hard ${{ env.GP_COMMIT }}
+
+                npm install
+                npm run build
+
+                popd
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: dashboard
+                path: dashboard/out
+
+            - name: Mark Commit Success
+              if: success()
+              run: |
+                ./report.sh \
+                  --state "success" \
+                  --description "GitHub Actions workflow succeeded" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
+
+            - name: Mark Commit Failure
+              if: failure()
+              run: |
+                ./report.sh \
+                  --state "failure" \
+                  --description "GitHub Actions workflow failed" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
