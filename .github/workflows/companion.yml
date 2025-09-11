@@ -1,0 +1,115 @@
+name: Unit Testing (Companion App)
+on:
+    repository_dispatch:
+        types: [companion]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.event.client_payload.after }}
+  cancel-in-progress: true
+
+jobs:
+    ci:
+        name: Unit Testing (Companion App)
+        runs-on: ubuntu-latest
+        env:
+            REPO_COMPANION: companion
+            GP_REPO: companion
+            GP_COMMIT: ${{ github.event.client_payload.after }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Mark Commit Status
+              run: |
+                ./report.sh \
+                  --state "pending" \
+                  --description "GitHub Actions workflow requested" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: '17'
+                cache: gradle
+
+            - name: Setup Android SDK
+              uses: android-actions/setup-android@v3
+
+            - name: Setup buf CLI
+              run: go install github.com/bufbuild/buf/cmd/buf@latest
+
+            - name: Protocol Buffers Lint
+              continue-on-error: true
+              run: buf lint
+
+            - name: Setup Deploy Keys
+              env:
+                GP_COMPANION: ${{ secrets.GP_COMPANION }}
+              run: |
+                ./keys.sh --companion
+
+            - name: Build and Test
+              run: |
+                git clone \
+                  git@companion.geopulse:${{ github.repository_owner }}/${{ env.REPO_COMPANION }}.git \
+                  ${{ github.workspace }}/companion
+
+                pushd companion
+
+                git fetch origin ${{ env.GP_COMMIT }}
+                git reset --hard ${{ env.GP_COMMIT }}
+
+                # Generate protocol buffers
+                buf generate
+
+                # On some branches this file is faulty
+                chmod +x ./gradlew
+
+                # Build (Debug mode)
+                ./gradlew --no-daemon assembleDebug
+
+                # Test (Debug mode)
+                ./gradlew --no-daemon testDebugUnitTest
+
+                # Lint (Debug mode)
+                ./gradlew --no-daemon lintDebug
+
+                popd
+
+            # Artifacts
+            - name: Upload Debug APK
+              uses: actions/upload-artifact@v4
+              with:
+                name: app-debug-apk
+                path: app/build/outputs/apk/debug/*.apk
+
+            - name: Upload Unit Test Report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: unit-test-report
+                path: app/build/reports/tests/testDebugUnitTest/
+
+            - name: Upload Lint Report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: lint-report
+                path: app/build/reports/lint-results-debug.html
+
+            - name: Mark Commit Success
+              if: success()
+              run: |
+                ./report.sh \
+                  --state "success" \
+                  --description "GitHub Actions workflow succeeded" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
+
+            - name: Mark Commit Failure
+              if: failure()
+              run: |
+                ./report.sh \
+                  --state "failure" \
+                  --description "GitHub Actions workflow failed" \
+                  --token ${{ secrets.GP_GITHUB_TOKEN }}
