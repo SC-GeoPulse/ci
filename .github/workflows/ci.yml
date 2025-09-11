@@ -155,6 +155,9 @@ jobs:
                 RUN --mount=type=secret,id=startup_sh,dst=/etc/secrets/startup.sh \
                     cp /etc/secrets/startup.sh . && chmod +x ./startup.sh
 
+                # We need cURL
+                apk add curl
+
                 ENTRYPOINT ./startup.sh; traefik --configFile=traefik.yml
 
                 " > Dockerfile.proxy
