@@ -43,10 +43,6 @@ jobs:
             - name: Setup buf CLI
               run: go install github.com/bufbuild/buf/cmd/buf@latest
 
-            - name: Protocol Buffers Lint
-              continue-on-error: true
-              run: buf lint
-
             - name: Setup Deploy Keys
               env:
                 GP_COMPANION: ${{ secrets.GP_COMPANION }}
@@ -79,6 +75,13 @@ jobs:
                 # Lint (Debug mode)
                 ./gradlew --no-daemon lintDebug
 
+                popd
+
+            - name: Protocol Buffers Lint
+              continue-on-error: true
+              run: |
+                pushd companion
+                buf lint
                 popd
 
             # Artifacts
