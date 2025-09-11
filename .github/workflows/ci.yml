@@ -156,7 +156,7 @@ jobs:
                     cp /etc/secrets/startup.sh . && chmod +x ./startup.sh
 
                 # We need cURL
-                apk add curl
+                RUN apk add curl
 
                 ENTRYPOINT ./startup.sh; traefik --configFile=traefik.yml
 
