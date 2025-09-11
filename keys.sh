@@ -8,6 +8,9 @@ case ${!i} in
     --backend)
     KEY_BACKEND=1
     ;;
+    --companion)
+    KEY_COMPANION=1
+    ;;
     --dashboard)
     KEY_DASHBOARD=1
     ;;
@@ -17,6 +20,7 @@ case ${!i} in
     --all)
     KEY_API=1
     KEY_BACKEND=1
+    KEY_COMPANION=1
     KEY_DASHBOARD=1
     KEY_CI=1
     ;;
@@ -48,6 +52,17 @@ if [[ "$KEY_BACKEND" == 1 ]]; then
         Host backend.geopulse
             Hostname github.com
             IdentityFile=$HOME/.ssh/gp_backend
+            User git
+    " >> $HOME/.ssh/config
+fi
+
+if [[ "$KEY_COMPANION" == 1 ]]; then
+    echo "$GP_COMPANION" > $HOME/.ssh/gp_companion
+
+    echo "
+        Host companion.geopulse
+            Hostname github.com
+            IdentityFile=$HOME/.ssh/gp_companion
             User git
     " >> $HOME/.ssh/config
 fi
