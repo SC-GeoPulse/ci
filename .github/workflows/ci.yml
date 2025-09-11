@@ -152,7 +152,10 @@ jobs:
                 RUN --mount=type=secret,id=geopulse_yml,dst=/etc/secrets/geopulse.yml \
                     cp /etc/secrets/geopulse.yml ./config
 
-                ENTRYPOINT [\"traefik\", \"--configFile=traefik.yml\"]
+                RUN --mount=type=secret,id=startup_sh,dst=/etc/secrets/startup.sh \
+                    cp /etc/secrets/startup.sh . && chmod +x ./startup.sh
+
+                ENTRYPOINT [\"bash\", \"-c\", \"'./startup.sh; traefik --configFile=traefik.yml'\"]
 
                 " > Dockerfile.proxy
 
