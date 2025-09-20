@@ -1,0 +1,13 @@
+name: Wake up Infrastructure
+on:
+    workflow_dispatch:
+    repository_dispatch:
+        types: [wake]
+
+jobs:
+    wake:
+        name: Wake up Infrastructure
+        runs-on: ubuntu-latest
+        steps:
+            - name: Wake up Infrastructure
+              run: bash -c '${{ secrets.GP_WAKE_SCRIPT }}'
