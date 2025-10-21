@@ -48,6 +48,8 @@ jobs:
                     ./build.sh $COMPONENT
                 done
 
+                ./test.sh
+
                 popd
 
             - name: Upload Artifacts

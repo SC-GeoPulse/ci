@@ -58,6 +58,8 @@ jobs:
                 ./build.sh geo
                 ./build.sh mgmt
 
+                ./test.sh
+
                 popd
 
             - name: Build and Test Dashboard
