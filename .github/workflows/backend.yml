@@ -33,6 +33,14 @@ jobs:
                 ./keys.sh --backend
 
             - name: Build and Test
+              env:
+                # Inject these secrets to enable SafetyCulture authentication unit tests.
+                GP_TEST_LOGIN_STANDARD_USERNAME: ${{ secrets.GP_TEST_LOGIN_STANDARD_USERNAME }}
+                GP_TEST_LOGIN_STANDARD_PASSWORD: ${{ secrets.GP_TEST_LOGIN_STANDARD_PASSWORD }}
+                GP_TEST_LOGIN_ADMINISTRATOR_USERNAME:
+                  ${{ secrets.GP_TEST_LOGIN_ADMINISTRATOR_USERNAME }}
+                GP_TEST_LOGIN_ADMINISTRATOR_PASSWORD:
+                  ${{ secrets.GP_TEST_LOGIN_ADMINISTRATOR_PASSWORD }}
               run: |
                 git clone \
                   git@backend.geopulse:${{ github.repository_owner }}/${{ env.REPO_BACKEND }}.git \
