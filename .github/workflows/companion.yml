@@ -70,7 +70,7 @@ jobs:
                 ./gradlew --no-daemon assembleDebug
 
                 # Test (Debug mode)
-                ./gradlew --no-daemon testDebugUnitTest
+                ./gradlew --no-daemon :app:testDevDebugUnitTest
 
                 # Lint (Debug mode)
                 ./gradlew --no-daemon lintDebug
